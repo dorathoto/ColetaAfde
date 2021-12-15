@@ -39,7 +39,6 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
             this.textBoxt = new System.Windows.Forms.RichTextBox();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
@@ -147,10 +146,6 @@
             this.textBoxt.ZoomFactor = 1.4F;
             this.textBoxt.TextChanged += new System.EventHandler(this.TextBoxt_TextChanged);
             // 
-            // backgroundWorker1
-            // 
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundWorker1_DoWork);
-            // 
             // progressBar1
             // 
             this.progressBar1.Location = new System.Drawing.Point(9, 181);
@@ -196,7 +191,6 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button3;
         public System.Windows.Forms.RichTextBox textBoxt;
-        public System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.ProgressBar progressBar1;
     }
 }

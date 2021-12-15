@@ -225,7 +225,6 @@ namespace ColetaAfde
                     Debug.WriteLine(ex.ToString());
                 }
             }
-            //backgroundWorker1.RunWorkerAsync();
             TesteReg();
 
         }
@@ -1001,10 +1000,7 @@ namespace ColetaAfde
 
         }
 
-        private void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
-        {
-            TesteReg();
-        }
+
     }
 
     // State object for receiving data from remote device.
