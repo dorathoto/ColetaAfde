@@ -1,14 +1,13 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
-using System.IO;
 using System.Security.Cryptography;
-using System.ComponentModel;
-using System.Diagnostics;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace ColetaAfde
 {
@@ -31,7 +30,7 @@ namespace ColetaAfde
             InitializeComponent();
         }
 
-        private void btnBuscar_Click(object sender, EventArgs e)
+        private void BtnBuscar_Click(object sender, EventArgs e)
         {
             if (textBox1.Text != "3000")
             {
@@ -76,14 +75,11 @@ namespace ColetaAfde
 
                     command = "";
                     command += (char)(2);
-                    // start byte
 
                     preCommand += (char)(7);
-                    // tamanho do comando
                     preCommand += (char)(0);
-                    // tamanho do comando
                     preCommand += "1+RA+00";
-                    chkSum = calcCheckSumString(preCommand);
+                    chkSum = CalcCheckSumString(preCommand);
 
                     command += preCommand;
                     command += Convert.ToChar(chkSum);
@@ -134,43 +130,38 @@ namespace ColetaAfde
                     Debug.WriteLine("strModulo-------->" + strModulo.ToString());
                     Debug.WriteLine("strExpodente----->" + strExpodente.ToString());
 
-                    strAux = "1]" + txtUsuario.Text + "]" + txtSenha.Text + "]" + System.Convert.ToBase64String(chaveAes);
+                    strAux = "1]" + txtUsuario.Text + "]" + txtSenha.Text + "]" + Convert.ToBase64String(chaveAes);
 
                     Debug.WriteLine("strAux----->" + strAux.ToString());
                     RSAPersistKeyInCSP(strModulo);
                     byte[] dataToEncrypt = Encoding.Default.GetBytes(strAux); // gerado um array contendo a string de dados de login
                     byte[] encryptedData = null; //array que irá receber os valores criptografados
 
-                    RSAParameters RSAKeyInfo = new RSAParameters();
-
-                    RSAKeyInfo.Modulus = System.Convert.FromBase64String(strModulo);
-                    RSAKeyInfo.Exponent = System.Convert.FromBase64String(strExpodente);
-
+                    RSAParameters RSAKeyInfo = new RSAParameters
+                    {
+                        Modulus = Convert.FromBase64String(strModulo),
+                        Exponent = Convert.FromBase64String(strExpodente)
+                    };
                     encryptedData = RSAEncrypt(dataToEncrypt, RSAKeyInfo, false); // recebeu os valores criptografados
-
-                    strAux = System.Convert.ToBase64String(encryptedData);
+                    strAux = Convert.ToBase64String(encryptedData);
 
 
                     strComandoComCriptografia = "2+EA+00+" + strAux;
 
                     preCommand = "";
                     command = "";
-                    command += Convert.ToChar(2);
                     // start byte
-                    preCommand += Convert.ToChar(strComandoComCriptografia.Length);
-                    // tamanho do comando
-                    preCommand += Convert.ToChar(0);
-                    // tamanho do comando
+                    command += Convert.ToChar(2);
+                    preCommand += Convert.ToChar(strComandoComCriptografia.Length); // tamanho do comando
+                    preCommand += Convert.ToChar(0); // tamanho do comando
                     preCommand += strComandoComCriptografia;
-                    chkSum = calcCheckSumString(preCommand);
-
+                    chkSum = CalcCheckSumString(preCommand);
                     command += preCommand;
                     command += Convert.ToChar(chkSum);
-                    // checksum
-
                     command += Convert.ToChar(3);
                     // end byte
-                    Thread.Sleep(800);
+
+                    //  Thread.Sleep(800);
                     Send(client, command);
                     sendDone.WaitOne();
                     quantBytesRec = client.Receive(bufferBytes);
@@ -352,7 +343,7 @@ namespace ColetaAfde
                     envCommand[i] = comandoByte[i];
                     //   Debug.WriteLine("comandoByte[" + i + "] = " + comandoByte[i] + "  envCommand[" + i + "] = " + envCommand[i]);
                 }
-                Thread.Sleep(1000);
+                // Thread.Sleep(1000);
                 Send2(client, envCommand);
                 sendDone.WaitOne();
 
@@ -451,7 +442,7 @@ namespace ColetaAfde
                 }
                 else
                 {
-                    textBoxt.AppendText("Registros salvos: " + dados + "\n");
+                    textBoxt.AppendText("Registro salvo: " + dados + "\n");
                     using (StreamWriter saida = new StreamWriter(@"E:\HenryREP\ColetaAfde\registerDataBase.txt", arqSave))
                     {
                         saida.Write(dados.ToString());
@@ -467,6 +458,37 @@ namespace ColetaAfde
                 Debug.WriteLine("Recebidos " + valor + " de " + quantRegistros);
             } while (counterReg * y < quantRegistros);
         }
+
+
+
+
+
+
+
+
+
+
+        //move para métodos e classes em separado
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         public static byte[] RSAEncrypt(byte[] DataToEncrypt, RSAParameters RSAKeyInfo, bool DoOAEPPadding)
         {
@@ -497,59 +519,7 @@ namespace ColetaAfde
                 return null;
             }
         }
-        //static public byte[] RSAEncrypt(byte[] DataToEncrypt, RSAParameters RSAKeyInfo, bool DoOAEPPadding)
-        //{
-        //    try
-        //    {
-        //        //Create a new instance of RSACryptoServiceProvider.
-        //        RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
 
-        //        //Import the RSA Key information. This only needs
-        //        //toinclude the public key information.
-        //        RSA.ImportParameters(RSAKeyInfo);
-
-        //        //Encrypt the passed byte array and specify OAEP padding.  
-        //        //OAEP padding is only available on Microsoft Windows XP or
-        //        //later.  
-        //        return RSA.Encrypt(DataToEncrypt, DoOAEPPadding);
-        //    }
-        //    //Catch and display a CryptographicException  
-        //    //to the console.
-        //    catch (CryptographicException e)
-        //    {
-        //        Debug.WriteLine(e.Message);
-
-        //        return null;
-        //    }
-
-        //}
-
-        static public byte[] RSADecrypt(byte[] DataToDecrypt, RSAParameters RSAKeyInfo, bool DoOAEPPadding)
-        {
-            try
-            {
-                //Create a new instance of RSACryptoServiceProvider.
-                RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
-
-                //Import the RSA Key information. This needs
-                //to include the private key information.
-                RSA.ImportParameters(RSAKeyInfo);
-
-                //Decrypt the passed byte array and specify OAEP padding.  
-                //OAEP padding is only available on Microsoft Windows XP or
-                //later.  
-                return RSA.Decrypt(DataToDecrypt, DoOAEPPadding);
-            }
-            //Catch and display a CryptographicException  
-            //to the console.
-            catch (CryptographicException e)
-            {
-                Debug.WriteLine(e.ToString());
-
-                return null;
-            }
-
-        }
 
         public static void RSAPersistKeyInCSP(string ContainerName) //recebe a string com a chave
         {
@@ -558,10 +528,12 @@ namespace ColetaAfde
                 // Create a new instance of CspParameters.  Pass
                 // 13 to specify a DSA container or 1 to specify
                 // an RSA container.  The default is 1.
-                CspParameters cspParams = new CspParameters();
+                CspParameters cspParams = new CspParameters
+                {
 
-                // Specify the container name using the passed variable.
-                cspParams.KeyContainerName = ContainerName;
+                    // Specify the container name using the passed variable.
+                    KeyContainerName = ContainerName
+                };
 
                 //Create a new instance of RSACryptoServiceProvider to generate
                 //a new key pair.  Pass the CspParameters class to persist the 
@@ -579,39 +551,6 @@ namespace ColetaAfde
             }
         }
 
-        public static void RSADeleteKeyInCSP(string ContainerName)
-        {
-            try
-            {
-                // Create a new instance of CspParameters.  Pass
-                // 13 to specify a DSA container or 1 to specify
-                // an RSA container.  The default is 1.
-                CspParameters cspParams = new CspParameters();
-
-                // Specify the container name using the passed variable.
-                cspParams.KeyContainerName = ContainerName;
-
-                //Create a new instance of RSACryptoServiceProvider. 
-                //Pass the CspParameters class to use the 
-                //key in the container.
-                RSACryptoServiceProvider RSAalg = new RSACryptoServiceProvider(cspParams);
-
-                //Explicitly set the PersistKeyInCsp property to false
-                //to delete the key entry in the container.
-                RSAalg.PersistKeyInCsp = false;
-
-                //Call Clear to release resources and delete the key from the container.
-                RSAalg.Clear();
-
-                //Indicate that the key was persisted.
-                Debug.WriteLine("The RSA key was deleted from the container, \"{0}\".", ContainerName);
-            }
-            catch (CryptographicException e)
-            {
-                Debug.WriteLine(e.Message);
-
-            }
-        }
         public static string Trim(string s)
         {
             return s.Trim();
@@ -621,7 +560,7 @@ namespace ColetaAfde
             string temp = s.Substring(a - 1, b);
             return temp;
         }
-        public byte calcCheckSumString(string data)
+        public byte CalcCheckSumString(string data)
         {
             String strBuf = "";
             String strAux = "";
@@ -638,83 +577,6 @@ namespace ColetaAfde
             return cks;
         }
 
-        private static void ConnectCallback(IAsyncResult ar)
-        {
-            try
-            {
-                // Retrieve the socket from the state object.
-                Socket client = (Socket)ar.AsyncState;
-
-                // Complete the connection.
-                client.EndConnect(ar);
-
-                Debug.WriteLine("Socket connected to {0}",
-                    client.RemoteEndPoint.ToString());
-
-                // Signal that the connection has been made.
-                connectDone.Set();
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.ToString());
-            }
-        }
-
-        private static void Receive(Socket client)
-        {
-            try
-            {
-                // Create the state object.
-                StateObject state = new StateObject();
-                state.workSocket = client;
-
-                // Begin receiving the data from the remote device.
-                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ReceiveCallback), state);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.ToString());
-            }
-        }
-
-        private static void ReceiveCallback(IAsyncResult ar)
-        {
-            try
-            {
-                // Retrieve the state object and the client socket 
-                // from the asynchronous state object.
-                StateObject state = (StateObject)ar.AsyncState;
-                Socket client = state.workSocket;
-
-                // Read data from the remote device.
-                int bytesRead = client.EndReceive(ar);
-
-                if (bytesRead > 0)
-                {
-                    // There might be more data, so store the data received so far.
-                    state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-
-                    // Get the rest of the data.
-                    client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                        new AsyncCallback(ReceiveCallback), state);
-                }
-                else
-                {
-                    // All the data has arrived; put it in response.
-                    if (state.sb.Length > 1)
-                    {
-                        response = state.sb.ToString();
-                    }
-                    // Signal that all bytes have been received.
-                    receiveDone.Set();
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.ToString());
-            }
-        }
 
         private static void Send(Socket client, String data)
         {
@@ -738,15 +600,10 @@ namespace ColetaAfde
         {
             try
             {
-                // Retrieve the socket from the state object.
                 Socket client = (Socket)ar.AsyncState;
-
-                // Complete sending the data to the remote device.
                 int bytesSent = client.EndSend(ar);
-                Debug.WriteLine("Sent {0} bytes to server.", bytesSent);
-
-                // Signal that all bytes have been sent.
-                sendDone.Set();
+                Debug.WriteLine("enviado {0} bytes para o REP", bytesSent);
+                sendDone.Set();// Sinaliza que todos os bytes foram enviados.
             }
             catch (Exception e)
             {
@@ -821,128 +678,6 @@ namespace ColetaAfde
 
         }
 
-        static byte[] EncryptStringToBytes_Aes2(String plainText, byte[] plainText2, byte[] Key, byte[] IV)
-        {
-            // Check arguments.
-            if (plainText == null || plainText.Length <= 0)
-                throw new ArgumentNullException("plainText");
-            if (plainText2 == null || plainText2.Length <= 0)
-                throw new ArgumentNullException("plainText");
-            if (Key == null || Key.Length <= 0)
-                throw new ArgumentNullException("Key");
-            if (IV == null || IV.Length <= 0)
-                throw new ArgumentNullException("Key");
-            byte[] encrypted;
-            // Create an Aes object
-            // with the specified key and IV.
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Key;
-                aesAlg.IV = IV;
-
-                aesAlg.Padding = PaddingMode.None;
-                aesAlg.Mode = CipherMode.CBC;
-
-                // Create a decrytor to perform the stream transform.
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-                // Create the streams used for encryption.
-                using (MemoryStream msEncrypt = new MemoryStream())
-                {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                    {
-                        byte[] bytesStr = Encoding.Default.GetBytes(plainText);
-                        csEncrypt.Write(bytesStr, 0, bytesStr.Length);
-                        csEncrypt.Write(plainText2, 0, plainText2.Length);
-                        int quant = bytesStr.Length + plainText2.Length;
-
-                        if (quant > 16)
-                        {
-                            quant %= 16;
-                        }
-                        quant = 16 - quant;
-                        byte[] bytesZeros = new byte[16] {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-                        if (quant < 16 && quant != 0)
-                        {
-                            csEncrypt.Write(bytesZeros, 0, quant);
-                            quant--;
-                        }
-                        //using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                        //{
-
-                        //swEncrypt.Write(plainText);
-
-
-                        //swEncrypt.BaseStream.Write(plainText2, 0, plainText2.Length);
-
-                        /*
-                        int x = 0;
-                        while (x < plainText2.Length) {
-                            swEncrypt.Write(Convert.ToChar(plainText2.ElementAt(x)));
-                            //swEncrypt.BaseStream.Write(plainText2, x, 1);
-                            x = x + 1;
-                        }
-                        /**/
-
-                        //}
-                        encrypted = msEncrypt.ToArray();
-                    }
-                }
-            }
-
-
-            // Return the encrypted bytes from the memory stream.
-            return encrypted;
-
-        }
-        static string DecryptStringFromBytes_Aes(byte[] cipherText, byte[] Key, byte[] IV)
-        {
-            // Check arguments.
-            if (cipherText == null || cipherText.Length <= 0)
-                throw new ArgumentNullException("cipherText");
-            if (Key == null || Key.Length <= 0)
-                throw new ArgumentNullException("Key");
-            if (IV == null || IV.Length <= 0)
-                throw new ArgumentNullException("Key");
-
-            // Declare the string used to hold
-            // the decrypted text.
-            string plaintext = null;
-
-            // Create an Aes object
-            // with the specified key and IV.
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Key;
-                aesAlg.IV = IV;
-
-                aesAlg.Padding = PaddingMode.None;
-                aesAlg.Mode = CipherMode.CBC;
-
-                // Create a decrytor to perform the stream transform.
-                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-                // Create the streams used for decryption.
-                using (MemoryStream msDecrypt = new MemoryStream(cipherText))
-                {
-                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                        {
-
-                            // Read the decrypted bytes from the decrypting stream
-                            // and place them in a string.
-                            plaintext = srDecrypt.ReadToEnd();
-                        }
-                    }
-                }
-
-            }
-
-            return plaintext;
-
-        }
 
         static byte[] DecryptStringFromBytes_Aes2(byte[] cipherText, byte[] Key, byte[] IV)
         {
@@ -994,27 +729,14 @@ namespace ColetaAfde
         {
             client.Close();
         }
-
-        private void TextBoxt_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-
     }
 
     // State object for receiving data from remote device.
     public class StateObject
     {
-        // Client socket.
-        public Socket workSocket = null;
-        // Size of receive buffer.
-        public const int BufferSize = 256;
-        // Receive buffer.
-        public byte[] buffer = new byte[BufferSize];
-        // Received data string.
-        public StringBuilder sb = new StringBuilder();
+        public Socket workSocket = null;        // Client socket.
+        public const int BufferSize = 256;// Size of receive buffer.
+        public byte[] buffer = new byte[BufferSize];// Receive buffer.
+        public StringBuilder sb = new StringBuilder();// Received data string.
     }
-
-
 }

@@ -101,7 +101,7 @@
             this.btnBuscar.TabIndex = 28;
             this.btnBuscar.Text = "Conectar";
             this.btnBuscar.UseVisualStyleBackColor = true;
-            this.btnBuscar.Click += new System.EventHandler(this.btnBuscar_Click);
+            this.btnBuscar.Click += new System.EventHandler(this.BtnBuscar_Click);
             // 
             // label2
             // 
@@ -144,7 +144,6 @@
             this.textBoxt.TabIndex = 48;
             this.textBoxt.Text = "saida de log...";
             this.textBoxt.ZoomFactor = 1.4F;
-            this.textBoxt.TextChanged += new System.EventHandler(this.TextBoxt_TextChanged);
             // 
             // progressBar1
             // 
