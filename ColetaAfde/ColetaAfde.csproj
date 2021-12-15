@@ -47,7 +47,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="entidades\equipamento\EquipamentoRep.cs" />
     <Compile Include="Form2.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -56,8 +55,6 @@
     </Compile>
     <Compile Include="ServidorRep.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="sockets\AnwerCommand.cs" />
-    <Compile Include="sockets\ClientHenry.cs" />
     <EmbeddedResource Include="Form2.resx">
       <DependentUpon>Form2.cs</DependentUpon>
     </EmbeddedResource>
