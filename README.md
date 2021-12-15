@@ -1,3 +1,5 @@
+## Explicativo do protocolo do relógio do Inmetro de forma detalhada
+
 Inicialmente é utilizada uma chave assimétrica para realizar a autenticação, e após esse comando os dados são criptografados com criptografia simétrica.
 
 São utilizadas criptografia *RSA 1024 bits*, e *AES CBC 16*.
@@ -33,4 +35,11 @@ Apenas o pacote de dados deve ser criptografado com o AES. O Start Byte, tamanho
 
 ###### Sugestão:
 - Entender como funciona criptografia RSA e AES.
+
+
+--------------------------
+## Tecnologia
+- Windows Form
+- C#
+- .Net Framework 4.8
 
