@@ -173,6 +173,7 @@
             this.Controls.Add(this.btnBuscar);
             this.Name = "Form2";
             this.Text = "POC";
+            this.TopMost = true;
             this.ResumeLayout(false);
             this.PerformLayout();
 
