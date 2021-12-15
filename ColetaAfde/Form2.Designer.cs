@@ -39,17 +39,17 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
             this.textBoxt = new System.Windows.Forms.RichTextBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // txtSenha
             // 
             this.txtSenha.Location = new System.Drawing.Point(84, 41);
             this.txtSenha.Name = "txtSenha";
-            this.txtSenha.Size = new System.Drawing.Size(138, 20);
+            this.txtSenha.Size = new System.Drawing.Size(236, 20);
             this.txtSenha.TabIndex = 38;
-            this.txtSenha.Text = "123456";
+            this.txtSenha.Text = "111111";
             // 
             // Label5
             // 
@@ -64,9 +64,9 @@
             // 
             this.txtUsuario.Location = new System.Drawing.Point(84, 13);
             this.txtUsuario.Name = "txtUsuario";
-            this.txtUsuario.Size = new System.Drawing.Size(138, 20);
+            this.txtUsuario.Size = new System.Drawing.Size(236, 20);
             this.txtUsuario.TabIndex = 36;
-            this.txtUsuario.Text = "Eduardo";
+            this.txtUsuario.Text = "teste fabrica";
             // 
             // Label4
             // 
@@ -90,15 +90,15 @@
             // 
             this.txtIP.Location = new System.Drawing.Point(84, 67);
             this.txtIP.Name = "txtIP";
-            this.txtIP.Size = new System.Drawing.Size(138, 20);
+            this.txtIP.Size = new System.Drawing.Size(236, 20);
             this.txtIP.TabIndex = 29;
-            this.txtIP.Text = "192.168.80.116";
+            this.txtIP.Text = "192.168.1.130";
             // 
             // btnBuscar
             // 
             this.btnBuscar.Location = new System.Drawing.Point(15, 141);
             this.btnBuscar.Name = "btnBuscar";
-            this.btnBuscar.Size = new System.Drawing.Size(93, 33);
+            this.btnBuscar.Size = new System.Drawing.Size(206, 33);
             this.btnBuscar.TabIndex = 28;
             this.btnBuscar.Text = "Conectar";
             this.btnBuscar.UseVisualStyleBackColor = true;
@@ -117,13 +117,13 @@
             // 
             this.textBox1.Location = new System.Drawing.Point(84, 95);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(138, 20);
+            this.textBox1.Size = new System.Drawing.Size(236, 20);
             this.textBox1.TabIndex = 45;
-            this.textBox1.TextChanged += new System.EventHandler(this.TextBox1_TextChanged);
+            this.textBox1.Text = "3000";
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(129, 141);
+            this.button3.Location = new System.Drawing.Point(227, 142);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(93, 33);
             this.button3.TabIndex = 46;
@@ -135,27 +135,28 @@
             // 
             this.textBoxt.AcceptsTab = true;
             this.textBoxt.AccessibleRole = System.Windows.Forms.AccessibleRole.ScrollBar;
-            this.textBoxt.Location = new System.Drawing.Point(9, 209);
+            this.textBoxt.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxt.Location = new System.Drawing.Point(9, 218);
             this.textBoxt.Name = "textBoxt";
             this.textBoxt.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.textBoxt.Size = new System.Drawing.Size(317, 135);
+            this.textBoxt.Size = new System.Drawing.Size(311, 376);
             this.textBoxt.TabIndex = 48;
-            this.textBoxt.Text = "\nVerifique se o equipamento está ligado\n\nPressione conectar";
+            this.textBoxt.Text = "saida de log...";
             this.textBoxt.ZoomFactor = 1.4F;
             this.textBoxt.TextChanged += new System.EventHandler(this.TextBoxt_TextChanged);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(147, 190);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(50, 13);
-            this.label3.TabIndex = 49;
-            this.label3.Text = "STATUS";
             // 
             // backgroundWorker1
             // 
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundWorker1_DoWork);
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(9, 181);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(311, 23);
+            this.progressBar1.TabIndex = 49;
             // 
             // Form2
             // 
@@ -163,8 +164,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(338, 356);
-            this.Controls.Add(this.label3);
+            this.ClientSize = new System.Drawing.Size(332, 606);
+            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.textBoxt);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.textBox1);
@@ -177,7 +178,7 @@
             this.Controls.Add(this.txtIP);
             this.Controls.Add(this.btnBuscar);
             this.Name = "Form2";
-            this.Text = "Form2";
+            this.Text = "POC";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -194,8 +195,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Label label3;
         public System.Windows.Forms.RichTextBox textBoxt;
         public System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.Windows.Forms.ProgressBar progressBar1;
     }
 }

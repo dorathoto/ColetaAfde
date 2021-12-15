@@ -8,22 +8,23 @@ using System.Threading;
 using System.IO;
 using System.Security.Cryptography;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace ColetaAfde
 {
     public partial class Form2 : Form
     {
         private static String response = String.Empty;
-        private static ManualResetEvent connectDone = new ManualResetEvent(false);
-        private static ManualResetEvent sendDone = new ManualResetEvent(false);
-        private static ManualResetEvent receiveDone = new ManualResetEvent(false);
-        private static int port;
+        private static readonly ManualResetEvent connectDone = new ManualResetEvent(false);
+        private static readonly ManualResetEvent sendDone = new ManualResetEvent(false);
+        private static readonly ManualResetEvent receiveDone = new ManualResetEvent(false);
+        private static int port = 3000;
         private Socket client;
         private byte[] chaveAes = new byte[16];
         private byte[] bufferBytes = new byte[1024];
-        byte[] registros = new byte[1024]; 
+        byte[] registros = new byte[1024];
         private static int quantBytesRec = 0;
-        
+
 
         public Form2()
         {
@@ -32,236 +33,245 @@ namespace ColetaAfde
 
         private void btnBuscar_Click(object sender, EventArgs e)
         {
-
+            if (textBox1.Text != "3000")
+            {
+                port = Convert.ToInt32(textBox1.Text);
+            }
             int varAux = 0;
             int varAux2 = 0;
-            while(varAux == 0){
-            try
+            while (varAux == 0)
             {
-                IPHostEntry ipHostInfo = Dns.Resolve(txtIP.Text);
-                IPAddress ipAddress = ipHostInfo.AddressList[0];
-                IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
-                string command = "";
-                string preCommand = "";
-                int idxByte = 0;
-                string strModulo = "";
-                string strExpodente = "";
-                string strRec = "";
-                byte chkSum = 0;
-                string strComandoComCriptografia = "";
-                string strAux = "";
-                string quantReg = "";
-
-                int i = 0;
-
-                if (client == null)
+                try
                 {
-                    client = new Socket(AddressFamily.InterNetwork,
-                    SocketType.Stream, ProtocolType.Tcp);
-                }
-                    // Create a TCP/IP socket.
-             
-                bool conectado = client.Connected;
+                    IPHostEntry ipHostInfo = Dns.Resolve(txtIP.Text);
+                    IPAddress ipAddress = ipHostInfo.AddressList[0];
+                    IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
+                    string command = "";
+                    string preCommand = "";
+                    int idxByte = 0;
+                    string strModulo = "";
+                    string strExpodente = "";
+                    string strRec = "";
+                    byte chkSum = 0;
+                    string strComandoComCriptografia = "";
+                    string strAux = "";
+                    string quantReg = "";
 
-                if (conectado == false)
-                {
-              // Connect to the remote endpoint.
-              // client.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), client);                   
-               client.Connect(remoteEP);                   
-                 //connectDone.WaitOne();
-                }
+                    int i = 0;
 
-                Random rnd = new Random();
+                    if (client == null)
+                    {
+                        client = new Socket(AddressFamily.InterNetwork,
+                        SocketType.Stream, ProtocolType.Tcp);
+                    }
 
-                chaveAes[0] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[1] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[2] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[3] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[4] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[5] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[6] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[7] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[8] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[9] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[10] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[11] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[12] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[13] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[14] = Convert.ToByte(rnd.Next(1, 256));
-                chaveAes[15] = Convert.ToByte(rnd.Next(1, 256));
-                
+                    bool conectado = client.Connected;
+
+                    if (conectado == false)
+                    {
+                        client.Connect(remoteEP);
+                    }
+
+                    GerarChaveAesAleatorias();
 
                     command = "";
-                command = command + (char)(2);
-                // start byte
+                    command += (char)(2);
+                    // start byte
 
-                preCommand = preCommand + (char)(7);
-                // tamanho do comando
-                preCommand = preCommand + (char)(0);
-                // tamanho do comando
-                preCommand = preCommand + "1+RA+00"; 
-                chkSum = calcCheckSumString(preCommand);
+                    preCommand += (char)(7);
+                    // tamanho do comando
+                    preCommand += (char)(0);
+                    // tamanho do comando
+                    preCommand += "1+RA+00";
+                    chkSum = calcCheckSumString(preCommand);
 
-                command = command + preCommand;
-                command = command + Convert.ToChar(chkSum);
-                // checksum
-                // end byte
-                command = command + (char)(3);
+                    command += preCommand;
+                    command += Convert.ToChar(chkSum);
+                    // checksum
+                    // end byte
+                    command += (char)(3);
 
-                Console.WriteLine("comando montado: " + command.ToString());
+                    Debug.WriteLine("comando montado: " + command.ToString());
 
-                // Send test data to the remote device.
-                Send(client, command);
-                sendDone.WaitOne();
+                    // Send test data to the remote device.
+                    Send(client, command);
+                    sendDone.WaitOne();
 
-                quantBytesRec = client.Receive(bufferBytes);
+                    quantBytesRec = client.Receive(bufferBytes);
 
-                response = "";
-                while (i < quantBytesRec)
-                {
-                    response = response + (char)bufferBytes[i];
-
-                    i = i + 1;
-                }
-
-                Console.WriteLine("string da resposta: " + response.ToString());
-
-                while (idxByte < quantBytesRec) //loop para separar o startbyte e endbyte e retirar apenas a chave Aes, porém, contem os +.
-                {
-                    if (idxByte >= 3)
+                    response = "";
+                    while (i < quantBytesRec)
                     {
-                        if (idxByte <= quantBytesRec - 3)
-                        {
-                            strRec = strRec + response.ElementAt(idxByte);
-                        }
+                        response += (char)bufferBytes[i];
+
+                        i++;
                     }
-                    idxByte = idxByte + 1;
-                }
-                Console.WriteLine("strRec----------->" + strRec.ToString());
-                strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1); // 
-                Console.WriteLine("strRec2---------->" + strRec.ToString());
-                strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
-                Console.WriteLine("strRec3---------->" + strRec.ToString());
-                strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
-                Console.WriteLine("strRec4---------->" + strRec.ToString());
 
-                strModulo = Mid(strRec, 1, strRec.IndexOf("]"));
-                strExpodente = Trim(Mid(strRec, strRec.IndexOf("]") + 2, strRec.Length - strRec.IndexOf("]") - 1));
+                    Debug.WriteLine("string da resposta: " + response.ToString());
 
-                Console.WriteLine("strModulo-------->" + strModulo.ToString());
-                Console.WriteLine("strExpodente----->" + strExpodente.ToString());
+                    while (idxByte < quantBytesRec) //loop para separar o startbyte e endbyte e retirar apenas a chave Aes, porém, contem os +.
+                    {
+                        if (idxByte >= 3)
+                        {
+                            if (idxByte <= quantBytesRec - 3)
+                            {
+                                strRec += response.ElementAt(idxByte);
+                            }
+                        }
+                        idxByte++;
+                    }
+                    Debug.WriteLine("strRec----------->" + strRec.ToString());
+                    strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1); // 
+                    Debug.WriteLine("strRec2---------->" + strRec.ToString());
+                    strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
+                    Debug.WriteLine("strRec3---------->" + strRec.ToString());
+                    strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
+                    Debug.WriteLine("strRec4---------->" + strRec.ToString());
 
-                strAux = "1]" + txtUsuario.Text + "]" + txtSenha.Text + "]" + System.Convert.ToBase64String(chaveAes);
+                    strModulo = Mid(strRec, 1, strRec.IndexOf("]"));
+                    strExpodente = Trim(Mid(strRec, strRec.IndexOf("]") + 2, strRec.Length - strRec.IndexOf("]") - 1));
 
-                Console.WriteLine("strAux----->" + strAux.ToString());
-                RSAPersistKeyInCSP(strModulo);
-                byte[] dataToEncrypt = Encoding.Default.GetBytes(strAux); // gerado um array contendo a string de dados de login
-                byte[] encryptedData = null; //array que irá receber os valores criptografados
+                    Debug.WriteLine("strModulo-------->" + strModulo.ToString());
+                    Debug.WriteLine("strExpodente----->" + strExpodente.ToString());
 
-                RSAParameters RSAKeyInfo = new RSAParameters();
+                    strAux = "1]" + txtUsuario.Text + "]" + txtSenha.Text + "]" + System.Convert.ToBase64String(chaveAes);
 
-                RSAKeyInfo.Modulus = System.Convert.FromBase64String(strModulo);
-                RSAKeyInfo.Exponent = System.Convert.FromBase64String(strExpodente);
+                    Debug.WriteLine("strAux----->" + strAux.ToString());
+                    RSAPersistKeyInCSP(strModulo);
+                    byte[] dataToEncrypt = Encoding.Default.GetBytes(strAux); // gerado um array contendo a string de dados de login
+                    byte[] encryptedData = null; //array que irá receber os valores criptografados
 
-                encryptedData = RSAEncrypt(dataToEncrypt, RSAKeyInfo, false); // recebeu os valores criptografados
+                    RSAParameters RSAKeyInfo = new RSAParameters();
 
-                strAux = System.Convert.ToBase64String(encryptedData);
+                    RSAKeyInfo.Modulus = System.Convert.FromBase64String(strModulo);
+                    RSAKeyInfo.Exponent = System.Convert.FromBase64String(strExpodente);
+
+                    encryptedData = RSAEncrypt(dataToEncrypt, RSAKeyInfo, false); // recebeu os valores criptografados
+
+                    strAux = System.Convert.ToBase64String(encryptedData);
 
 
-                strComandoComCriptografia = "2+EA+00+" + strAux;
+                    strComandoComCriptografia = "2+EA+00+" + strAux;
 
-                preCommand = "";
-                command = "";
-                command = command + Convert.ToChar(2);
-                // start byte
-                preCommand = preCommand + Convert.ToChar(strComandoComCriptografia.Length);
-                // tamanho do comando
-                preCommand = preCommand + Convert.ToChar(0);
-                // tamanho do comando
-                preCommand = preCommand + strComandoComCriptografia;
-                chkSum = calcCheckSumString(preCommand);
+                    preCommand = "";
+                    command = "";
+                    command += Convert.ToChar(2);
+                    // start byte
+                    preCommand += Convert.ToChar(strComandoComCriptografia.Length);
+                    // tamanho do comando
+                    preCommand += Convert.ToChar(0);
+                    // tamanho do comando
+                    preCommand += strComandoComCriptografia;
+                    chkSum = calcCheckSumString(preCommand);
 
-                command = command + preCommand;
-                command = command + Convert.ToChar(chkSum);
-                // checksum
+                    command += preCommand;
+                    command += Convert.ToChar(chkSum);
+                    // checksum
 
-                command = command + Convert.ToChar(3);
+                    command += Convert.ToChar(3);
                     // end byte
                     Thread.Sleep(800);
-                Send(client, command);
-                sendDone.WaitOne();
-                quantBytesRec = client.Receive(bufferBytes);
-                response = "";
-                i = 0;
-                while (i < quantBytesRec)
-                {
-
-                    response = response + Convert.ToChar(bufferBytes[i]);
-                    i = i + 1;
-                }
-
-                strRec = "";
-                idxByte = 0;
-                while (idxByte < quantBytesRec)
-                {
-                    if (idxByte >= 3)
+                    Send(client, command);
+                    sendDone.WaitOne();
+                    quantBytesRec = client.Receive(bufferBytes);
+                    response = "";
+                    i = 0;
+                    while (i < quantBytesRec)
                     {
-                        if (idxByte <= quantBytesRec - 3)
-                        {
-                            strRec = strRec + response.ElementAt(idxByte);
-                        }
-                    }
-                    idxByte = idxByte + 1;
-                }
-                strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
-                strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
 
-                if (strRec == "000")
-                {
-                    Console.WriteLine("Autenticado");
-                    textBoxt.AppendText("\nAutenticado!");
-                    varAux = 1; // variável para loop de autenticação
-                    varAux2 = 0;
-                }
-                else
-                {
-                    Console.WriteLine("Não autenticado.(" + strRec + ")");
-                   // MessageBox.Show("Não autenticado!");
-                    textBoxt.AppendText("\nAutenticado!");
-                    textBoxt.AppendText("\nTentando reconectar com o socket...");
-                    varAux2++;
-                    if (varAux2 > 5){
+                        response += Convert.ToChar(bufferBytes[i]);
+                        i++;
+                    }
+
+                    strRec = "";
+                    idxByte = 0;
+                    while (idxByte < quantBytesRec)
+                    {
+                        if (idxByte >= 3)
+                        {
+                            if (idxByte <= quantBytesRec - 3)
+                            {
+                                strRec += response.ElementAt(idxByte);
+                            }
+                        }
+                        idxByte++;
+                    }
+                    strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
+                    strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
+
+                    if (strRec == "000")
+                    {
+                        Debug.WriteLine("Autenticado");
+                        textBoxt.AppendText("\nAutenticado!");
+                        varAux = 1; // variável para loop de autenticação
+                        varAux2 = 0;
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Não autenticado.(" + strRec + ")");
+                        // MessageBox.Show("Não autenticado!");
+                        textBoxt.AppendText("\nAutenticado!");
+                        textBoxt.AppendText("\nTentando reconectar com o socket...");
+                        varAux2++;
+                        if (varAux2 > 5)
+                        {
                             MessageBox.Show("Não foi possível conectar ao equipamento.");
                             return;
                         }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.ToString());
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            } 
-         }
             //backgroundWorker1.RunWorkerAsync();
-            testeReg();
-           
+            TesteReg();
+
         }
 
-        public void testeReg()
+        private void GerarChaveAesAleatorias()
+        {
+            Random rnd = new Random();
+            chaveAes[0] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[1] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[2] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[3] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[4] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[5] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[6] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[7] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[8] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[9] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[10] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[11] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[12] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[13] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[14] = Convert.ToByte(rnd.Next(1, 256));
+            chaveAes[15] = Convert.ToByte(rnd.Next(1, 256));
+        }
+
+        public void TesteReg()
         {
             int y = 5;
             int quantRegistros = 0;
             int counterReg = 0;
-            string strComandoComCriptografia = "";
+            var strComandoComCriptografia = "";
             bool arqSave = false;
 
             do
             {
 
-                if (counterReg > 0) strComandoComCriptografia = "01+RR+00+N]" + y.ToString() + "]" + (counterReg * y - (y-1)).ToString(); //counterReg.ToString();// + txtRegistros.Text + "]1";
-               // if (counterReg > 0) strComandoComCriptografia = "01+RR+00+N]" + y.ToString() + "]999";
-                                                                                                           //  if (counterReg > 0) strComandoComCriptografia = "01+RR+00+N]1]" + (counterReg+1).ToString();
+                if (counterReg > 0)
+                {
+                    strComandoComCriptografia = "01+RR+00+N]" + y.ToString() + "]" + (counterReg * y - (y - 1)).ToString(); //counterReg.ToString();// + txtRegistros.Text + "]1";
+                }
+                // if (counterReg > 0) strComandoComCriptografia = "01+RR+00+N]" + y.ToString() + "]999";
+                //  if (counterReg > 0) strComandoComCriptografia = "01+RR+00+N]1]" + (counterReg+1).ToString();
+
+
                 else strComandoComCriptografia = "01+RQ+00+R";
-           
+
                 counterReg++;
                 int i = 0;
                 int chkSum = 0;
@@ -304,57 +314,58 @@ namespace ColetaAfde
                 byte[] cmdCrypt = Encoding.Default.GetBytes(Encoding.Default.GetChars(EncryptStringToBytes_Aes(strComandoComCriptografia, chaveAes, IV)));
                 chkSum = 0;
                 i = 0;
-            
+
                 while (i < IV.Length)
                 {
                     comandoByte[IdxComandoByte] = IV[i];
-                    IdxComandoByte = IdxComandoByte + 1;
-                    i = i + 1;
+                    IdxComandoByte++;
+                    i++;
                 }
                 i = 0;
-                  while (i < cmdCrypt.Length)  
+                while (i < cmdCrypt.Length)
                 {
                     comandoByte[IdxComandoByte] = cmdCrypt[i];
-                    IdxComandoByte = IdxComandoByte + 1;
-                    i = i + 1;
+                    IdxComandoByte++;
+                    i++;
                 }
-                
+
                 i = 1;
                 while (i < IdxComandoByte)
                 {
-                    chkSum = chkSum ^ comandoByte[i];
-                    i = i + 1;
+                    chkSum ^= comandoByte[i];
+                    i++;
                 }
                 comandoByte[IdxComandoByte] = (byte)chkSum;
-                IdxComandoByte = IdxComandoByte + 1;
-                                                
+                IdxComandoByte++;
+
                 comandoByte[IdxComandoByte] = 3;
-         
+
                 string strAux = "";
                 i = 0;
                 while (i < IdxComandoByte)
                 {
-                    strAux = strAux + Convert.ToChar(comandoByte[i]);
-                    i = i + 1;
+                    strAux += Convert.ToChar(comandoByte[i]);
+                    i++;
                 }
                 byte[] envCommand = new byte[IdxComandoByte + 1];
-                for (i = 0; i < IdxComandoByte + 1; i++){
+                for (i = 0; i < IdxComandoByte + 1; i++)
+                {
                     envCommand[i] = comandoByte[i];
-                 //   Console.WriteLine("comandoByte[" + i + "] = " + comandoByte[i] + "  envCommand[" + i + "] = " + envCommand[i]);
+                    //   Debug.WriteLine("comandoByte[" + i + "] = " + comandoByte[i] + "  envCommand[" + i + "] = " + envCommand[i]);
                 }
                 Thread.Sleep(1000);
                 Send2(client, envCommand);
                 sendDone.WaitOne();
-                
+
                 quantBytesRec = client.Receive(bufferBytes);
-              
+
                 response = "";
                 i = 0;
                 while (i < quantBytesRec)
                 {
-                    response = response + (char)bufferBytes[i];
+                    response += (char)bufferBytes[i];
                     bufferBytes[i] = 0;
-                    i = i + 1;
+                    i++;
                 }
 
                 i = 0;
@@ -368,17 +379,17 @@ namespace ColetaAfde
                         if (idxByte <= quantBytesRec - 3)
                         {
                             byteData[i] = Convert.ToByte(response.ElementAt(idxByte)); //contém a resposta em bytes armazenada
-                            i = i + 1;
-                            strRec = strRec + response.ElementAt(idxByte);
+                            i++;
+                            strRec += response.ElementAt(idxByte);
                         }
                     }
-                    idxByte = idxByte + 1;
+                    idxByte++;
                 }
                 i = 0;
                 while (i < 16)
                 {
                     IV[i] = byteData[i];
-                    i = i + 1;
+                    i++;
                 }
 
                 byte[] byteData2 = new byte[quantBytesRec - 16 - 5];
@@ -388,11 +399,12 @@ namespace ColetaAfde
                 {
                     byteData2[i] = byteData[i + 16];
                     byteData[i + 16] = 0;
-                    i = i + 1;
+                    i++;
                 }
 
                 byte[] bufferRecDecrypt = DecryptStringFromBytes_Aes2(byteData2, chaveAes, IV);
-                for (i = 0; i < byteData2.Length; i++){
+                for (i = 0; i < byteData2.Length; i++)
+                {
                     byteData2[i] = 0;
                 }
 
@@ -403,77 +415,115 @@ namespace ColetaAfde
                     {
                         break;
                     }
-                    i = i + 1;
+                    i++;
                 }
 
-                  for (i = 0; i < bufferRecDecrypt.Length; i++)
-                  {
-                      registros[i] = bufferRecDecrypt[i];
-                      bufferRecDecrypt[i] = 0;  
-                      //Console.WriteLine("registros[" + i + "] = " + registros[i]);
-                  }
+                for (i = 0; i < bufferRecDecrypt.Length; i++)
+                {
+                    registros[i] = bufferRecDecrypt[i];
+                    bufferRecDecrypt[i] = 0;
+                    //Console.WriteLine("registros[" + i + "] = " + registros[i]);
+                }
                 i = 0;
 
                 for (i = 0; i < registros.Length; i++)
                 {
                     if (registros[i] != 0)
                     {
-                        dados = dados + Convert.ToChar(registros[i]);
+                        dados += Convert.ToChar(registros[i]);
                         registros[i] = 0;
                     }
                 }
 
-                Console.WriteLine("Resposta do equipamento: " + dados);
+                Debug.WriteLine("Resposta do equipamento: " + dados);
                 dados = Mid(dados, dados.IndexOf("]") + 2, dados.Length - dados.IndexOf("]") - 1);
-                Console.WriteLine("Resposta do equipamento2: " + dados);
-                if (dados.Contains("+") || dados.Contains("]")){
+                Debug.WriteLine("Resposta do equipamento2: " + dados);
+                if (dados.Contains("+") || dados.Contains("]"))
+                {
                     dados = Mid(dados, dados.IndexOf("]") + 2, dados.Length - dados.IndexOf("]") - 1);
                     continue;
                 }
-                if (quantRegistros == 0){                 
+                if (quantRegistros == 0)
+                {
                     textBoxt.AppendText("\n\nQuantidade de registros: " + dados + "\n");
-                 
-                   quantRegistros = Convert.ToInt32(dados);
-                }else
-                    {
+
+                    quantRegistros = Convert.ToInt32(dados);
+                    progressBar1.Maximum = quantRegistros;
+                }
+                else
+                {
                     textBoxt.AppendText("Registros salvos: " + dados + "\n");
                     using (StreamWriter saida = new StreamWriter(@"E:\HenryREP\ColetaAfde\registerDataBase.txt", arqSave))
                     {
-                       saida.Write(dados.ToString());
-                       dados = null; 
+                        saida.Write(dados.ToString());
+                        dados = null;
                     }
                     arqSave = true;
-                }         
-                Console.WriteLine("Recebidos " + counterReg*y + " de " + quantRegistros);
-            } while (counterReg*y < quantRegistros);
+                }
+                var valor = counterReg * y;
+                if (valor < progressBar1.Maximum)
+                {
+                    progressBar1.Value = valor;
+                }
+                Debug.WriteLine("Recebidos " + valor + " de " + quantRegistros);
+            } while (counterReg * y < quantRegistros);
         }
 
-        static public byte[] RSAEncrypt(byte[] DataToEncrypt, RSAParameters RSAKeyInfo, bool DoOAEPPadding)
+        public static byte[] RSAEncrypt(byte[] DataToEncrypt, RSAParameters RSAKeyInfo, bool DoOAEPPadding)
         {
             try
             {
+                byte[] encryptedData;
                 //Create a new instance of RSACryptoServiceProvider.
-                RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
+                using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
+                {
 
-                //Import the RSA Key information. This only needs
-                //toinclude the public key information.
-                RSA.ImportParameters(RSAKeyInfo);
+                    //Import the RSA Key information. This only needs
+                    //toinclude the public key information.
+                    RSA.ImportParameters(RSAKeyInfo);
 
-                //Encrypt the passed byte array and specify OAEP padding.  
-                //OAEP padding is only available on Microsoft Windows XP or
-                //later.  
-                return RSA.Encrypt(DataToEncrypt, DoOAEPPadding);
+                    //Encrypt the passed byte array and specify OAEP padding.  
+                    //OAEP padding is only available on Microsoft Windows XP or
+                    //later.  
+                    encryptedData = RSA.Encrypt(DataToEncrypt, DoOAEPPadding);
+                }
+                return encryptedData;
             }
             //Catch and display a CryptographicException  
             //to the console.
             catch (CryptographicException e)
             {
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
 
                 return null;
             }
-
         }
+        //static public byte[] RSAEncrypt(byte[] DataToEncrypt, RSAParameters RSAKeyInfo, bool DoOAEPPadding)
+        //{
+        //    try
+        //    {
+        //        //Create a new instance of RSACryptoServiceProvider.
+        //        RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
+
+        //        //Import the RSA Key information. This only needs
+        //        //toinclude the public key information.
+        //        RSA.ImportParameters(RSAKeyInfo);
+
+        //        //Encrypt the passed byte array and specify OAEP padding.  
+        //        //OAEP padding is only available on Microsoft Windows XP or
+        //        //later.  
+        //        return RSA.Encrypt(DataToEncrypt, DoOAEPPadding);
+        //    }
+        //    //Catch and display a CryptographicException  
+        //    //to the console.
+        //    catch (CryptographicException e)
+        //    {
+        //        Debug.WriteLine(e.Message);
+
+        //        return null;
+        //    }
+
+        //}
 
         static public byte[] RSADecrypt(byte[] DataToDecrypt, RSAParameters RSAKeyInfo, bool DoOAEPPadding)
         {
@@ -495,7 +545,7 @@ namespace ColetaAfde
             //to the console.
             catch (CryptographicException e)
             {
-                Console.WriteLine(e.ToString());
+                Debug.WriteLine(e.ToString());
 
                 return null;
             }
@@ -521,11 +571,11 @@ namespace ColetaAfde
                 RSACryptoServiceProvider RSAalg = new RSACryptoServiceProvider(cspParams);
 
                 //Indicate that the key was persisted.
-                Console.WriteLine("The RSA key was persisted in the container, \"{0}\".", ContainerName);
+                Debug.WriteLine("The RSA key was persisted in the container, \"{0}\".", ContainerName);
             }
             catch (CryptographicException e)
             {
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
 
             }
         }
@@ -555,11 +605,11 @@ namespace ColetaAfde
                 RSAalg.Clear();
 
                 //Indicate that the key was persisted.
-                Console.WriteLine("The RSA key was deleted from the container, \"{0}\".", ContainerName);
+                Debug.WriteLine("The RSA key was deleted from the container, \"{0}\".", ContainerName);
             }
             catch (CryptographicException e)
             {
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
 
             }
         }
@@ -569,7 +619,7 @@ namespace ColetaAfde
         }
         public static string Mid(string s, int a, int b)
         {
-            string temp = s.Substring(a - 1, b);     
+            string temp = s.Substring(a - 1, b);
             return temp;
         }
         public byte calcCheckSumString(string data)
@@ -582,9 +632,9 @@ namespace ColetaAfde
             while (i < data.Length)
             {
                 strAux = ((byte)(data.ElementAt(i))).ToString("X2");
-                strBuf = strBuf + strAux;
+                strBuf += strAux;
                 cks = (byte)(cks ^ (byte)(data.ElementAt(i)));
-                i = i + 1;
+                i++;
             }
             return cks;
         }
@@ -599,7 +649,7 @@ namespace ColetaAfde
                 // Complete the connection.
                 client.EndConnect(ar);
 
-                Console.WriteLine("Socket connected to {0}",
+                Debug.WriteLine("Socket connected to {0}",
                     client.RemoteEndPoint.ToString());
 
                 // Signal that the connection has been made.
@@ -607,7 +657,7 @@ namespace ColetaAfde
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Debug.WriteLine(e.ToString());
             }
         }
 
@@ -625,7 +675,7 @@ namespace ColetaAfde
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Debug.WriteLine(e.ToString());
             }
         }
 
@@ -663,7 +713,7 @@ namespace ColetaAfde
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Debug.WriteLine(e.ToString());
             }
         }
 
@@ -694,14 +744,14 @@ namespace ColetaAfde
 
                 // Complete sending the data to the remote device.
                 int bytesSent = client.EndSend(ar);
-                Console.WriteLine("Sent {0} bytes to server.", bytesSent);                
+                Debug.WriteLine("Sent {0} bytes to server.", bytesSent);
 
                 // Signal that all bytes have been sent.
                 sendDone.Set();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Debug.WriteLine(e.ToString());
             }
         }
 
@@ -721,7 +771,7 @@ namespace ColetaAfde
             {
                 int teste3 = aesAlg.BlockSize;
                 int teste4 = aesAlg.KeySize;
-                Console.WriteLine("tamanho: " + teste3 + "  chave: " + teste4);
+                Debug.WriteLine("tamanho: " + teste3 + "  chave: " + teste4);
                 aesAlg.Key = Key;
                 aesAlg.IV = IV;
 
@@ -746,7 +796,7 @@ namespace ColetaAfde
 
                             if (quant > 16)
                             {
-                                quant = quant % 16;
+                                quant %= 16;
                             }
                             else
                             {
@@ -756,7 +806,7 @@ namespace ColetaAfde
                             while (quant < 17 && quant != 0)
                             {
                                 swEncrypt.Write(Convert.ToChar(Convert.ToByte("0")));
-                                quant = quant - 1;
+                                quant--;
                             }
 
 
@@ -809,7 +859,7 @@ namespace ColetaAfde
 
                         if (quant > 16)
                         {
-                            quant = quant % 16;
+                            quant %= 16;
                         }
                         quant = 16 - quant;
                         byte[] bytesZeros = new byte[16] {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -817,7 +867,7 @@ namespace ColetaAfde
                         if (quant < 16 && quant != 0)
                         {
                             csEncrypt.Write(bytesZeros, 0, quant);
-                            quant = quant - 1;
+                            quant--;
                         }
                         //using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
                         //{
@@ -940,18 +990,6 @@ namespace ColetaAfde
 
         }
 
-        private void TextBox1_TextChanged(object sender, EventArgs e)
-        {   
-            if (!string.IsNullOrEmpty(textBox1.Text)){
-                try{
-            port = Convert.ToInt32(textBox1.Text);
-            Console.WriteLine("valor da porta: " + port);
-                } catch (Exception ex){
-                    Console.WriteLine(ex);
-                    MessageBox.Show("A porta só pode conter números!");
-                }  
-            }
-        }
 
         private void Button3_Click(object sender, EventArgs e)
         {
@@ -960,12 +998,12 @@ namespace ColetaAfde
 
         private void TextBoxt_TextChanged(object sender, EventArgs e)
         {
-        
+
         }
 
         private void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            testeReg();
+            TesteReg();
         }
     }
 
