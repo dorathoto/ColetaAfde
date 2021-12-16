@@ -1,6 +1,6 @@
 ## Explicativo do protocolo do relógio do Inmetro de forma detalhada
 
-Inicialmente é utilizada uma chave assimétrica para realizar a autenticação, e após esse comando os dados são criptografados com criptografia simétrica.
+Inicialmente é utilizada uma chave assimétrica(chave pública) para realizar a autenticação, e após esse comando os dados são criptografados com criptografia simétrica.
 
 São utilizadas criptografia *RSA 1024 bits*, e *AES CBC 16*.
 
