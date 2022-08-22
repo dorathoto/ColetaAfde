@@ -1,3 +1,4 @@
+
 ## Explicativo do protocolo do relógio do Inmetro de forma detalhada
 
 Inicialmente é utilizada uma chave assimétrica(chave pública) para realizar a autenticação, e após esse comando os dados são criptografados com criptografia simétrica.
@@ -10,16 +11,17 @@ São utilizadas criptografia *RSA 1024 bits*, e *AES CBC 16*.
 1. O software envia o comando RA.
 2. O equipamento devolve a sua chave pública RSA.
 3. O software deverá montar o pacote contendo o login, senha e chave AES (em base64) que será usada nos próximos comandos:
-3.1- Gerar uma chave AES aleatória
-3.2- Encodar em base64.
-3.3- Criar o pacote de dados. Exemplo: `"1]testefabrica]111111]MTExMTExMTExMTExMTExMQ=="`
-3.4- Criptografar esse pacote com a chave pública RSA recebida do equipamento no comando 2.
-3.5- Encodar o pacote criptografado em base64.
-3.6- Enviar o comando `EA. Ex: EA+00+<DADOS ACIMA CRIPTOGRAFADOS COM RSA E EM BASE64>`
-
+  3.1- Gerar uma chave AES aleatória
+  3.2- Encodar em base64.
+  3.3- Criar o pacote de dados. Exemplo: `"1]testefabrica]111111]MTExMTExMTExMTExMTExMQ=="`
+  3.4- Criptografar esse pacote com a chave pública RSA recebida do equipamento no comando 2.
+  3.5- Encodar o pacote criptografado em base64.
+  3.6- Enviar o comando `EA. Ex: EA+00+<DADOS ACIMA CRIPTOGRAFADOS COM RSA E EM BASE64>`
 1. À partir deste comando o usuário deverá criptografar os pacotes usando AES CBC com a chave informada no comando EA.
 
 Apenas o pacote de dados deve ser criptografado com o AES. O Start Byte, tamanho do pacote, Checksum e End byte devem ser enviados normalmente.
+
+Ex:
 
 `0x02 0x?? 0x?? <DADOS CRIPTOGRAFADOS> 0xCS 0x03`
 
