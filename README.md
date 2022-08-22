@@ -1,5 +1,5 @@
 
-## Explicativo do protocolo do relógio do Inmetro de forma detalhada
+## Explicativo do protocolo do relógio (REP) Henry de forma detalhada
 
 Inicialmente é utilizada uma chave assimétrica(chave pública) para realizar a autenticação, e após esse comando os dados são criptografados com criptografia simétrica.
 
