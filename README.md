@@ -8,8 +8,8 @@ São utilizadas criptografia *RSA 1024 bits*, e *AES CBC 16*.
 
 **O processo para autenticação no Hexa é basicamente o seguinte:**
 1. O software envia o comando RA.
-1. O equipamento devolve a sua chave pública RSA.
-1. O software deverá montar o pacote contendo o login, senha e chave AES (em base64) que será usada nos próximos comandos:
+2. O equipamento devolve a sua chave pública RSA.
+3. O software deverá montar o pacote contendo o login, senha e chave AES (em base64) que será usada nos próximos comandos:
 3.1- Gerar uma chave AES aleatória
 3.2- Encodar em base64.
 3.3- Criar o pacote de dados. Exemplo: `"1]testefabrica]111111]MTExMTExMTExMTExMTExMQ=="`
