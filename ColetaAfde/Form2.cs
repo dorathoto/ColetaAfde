@@ -27,14 +27,20 @@ namespace ColetaAfde
 
         public Form2()
         {
+            //melhorar buffer textBox log
+            this.SetStyle(
+                      ControlStyles.AllPaintingInWmPaint |
+                      ControlStyles.UserPaint |
+                      ControlStyles.DoubleBuffer, true);
+            
             InitializeComponent();
         }
 
         private void BtnBuscar_Click(object sender, EventArgs e)
         {
-            if (textBox1.Text != "3000")
+            if (txtPort.Text != "3000")
             {
-                port = Convert.ToInt32(textBox1.Text);
+                port = Convert.ToInt32(txtPort.Text);
             }
             int varAux = 0;
             int varAux2 = 0;
@@ -78,7 +84,7 @@ namespace ColetaAfde
 
                     preCommand += (char)(7);
                     preCommand += (char)(0);
-                    preCommand += "1+RA+00";
+                    preCommand += "1+RA+00"; // RA = Autenticação
                     chkSum = CalcCheckSumString(preCommand);
 
                     command += preCommand;
@@ -146,7 +152,7 @@ namespace ColetaAfde
                     strAux = Convert.ToBase64String(encryptedData);
 
 
-                    strComandoComCriptografia = "2+EA+00+" + strAux;
+                    strComandoComCriptografia = "2+EA+00+" + strAux; //Solicita autenticação do usuário no equipamento.				
 
                     preCommand = "";
                     command = "";
@@ -201,7 +207,7 @@ namespace ColetaAfde
                     {
                         Debug.WriteLine("Não autenticado.(" + strRec + ")");
                         // MessageBox.Show("Não autenticado!");
-                        textBoxt.AppendText("\nAutenticado!");
+                        textBoxt.AppendText("\nNão Autenticado!");
                         textBoxt.AppendText("\nTentando reconectar com o socket...");
                         varAux2++;
                         if (varAux2 > 5)
@@ -252,17 +258,30 @@ namespace ColetaAfde
             do
             {
 
-                if (counterReg > 0)
-                {
-                    strComandoComCriptografia = "01+RR+00+N]" + y.ToString() + "]" + (counterReg * y - (y - 1)).ToString(); //counterReg.ToString();// + txtRegistros.Text + "]1";
-                }
                 // if (counterReg > 0) strComandoComCriptografia = "01+RR+00+N]" + y.ToString() + "]999";
                 //  if (counterReg > 0) strComandoComCriptografia = "01+RR+00+N]1]" + (counterReg+1).ToString();
 
 
-                else strComandoComCriptografia = "01+RQ+00+R";
+                if (counterReg > 0)
+                {
+                    var qtdRegistros = counterReg * y - (y - 1);
+                    //RR - Recebe os registros				
+                    
+                    strComandoComCriptografia = "01+RR+00+N]" + y.ToString() + "]" + (counterReg * y - (y - 1)).ToString(); //counterReg.ToString();// + txtRegistros.Text + "]1";
+                    Debug.WriteLine($"Comando enviado.: {strComandoComCriptografia}");
+                    
+                   // strComandoComCriptografia = "01+RR+00+D]12]11/09/2022 02:00:01]"; // base de data
+                  //  Debug.WriteLine($"Comando enviado.: {strComandoComCriptografia}");
+
+                }
+                else
+                {
+                    strComandoComCriptografia = "01+RQ+00+R";
+                }
 
                 counterReg++;
+
+                
                 int i = 0;
                 int chkSum = 0;
                 string strRec = "";
@@ -289,10 +308,21 @@ namespace ColetaAfde
                 IV[14] = Convert.ToByte(rnd.Next(1, 256));
                 IV[15] = Convert.ToByte(rnd.Next(1, 256));
                 int tamanhoPacote;
+                
                 if ((counterReg * y - (y - 1)) < 1001)
+                {
                     tamanhoPacote = 32;
-                else if ((counterReg * y - (y - 1)) < 10001) tamanhoPacote = 48;
-                else tamanhoPacote = 64;
+                }
+                else if ((counterReg * y - (y - 1)) < 10001)
+                {
+                    tamanhoPacote = 48;
+                }
+                else
+                {
+                    tamanhoPacote = 64;
+                }
+
+
                 byte[] comandoByte = new byte[1024]; //37                         
                 int IdxComandoByte = 3;
                 comandoByte[0] = 2;
@@ -426,6 +456,7 @@ namespace ColetaAfde
                 }
 
                 Debug.WriteLine("Resposta do equipamento: " + dados);
+                textBoxt.AppendText(dados);
                 dados = Mid(dados, dados.IndexOf("]") + 2, dados.Length - dados.IndexOf("]") - 1);
                 Debug.WriteLine("Resposta do equipamento2: " + dados);
                 if (dados.Contains("+") || dados.Contains("]"))
@@ -443,7 +474,8 @@ namespace ColetaAfde
                 else
                 {
                     textBoxt.AppendText("Registro salvo: " + dados + "\n");
-                    using (StreamWriter saida = new StreamWriter(@"E:\HenryREP\ColetaAfde\registerDataBase.txt", arqSave))
+                    
+                    using (StreamWriter saida = new StreamWriter(txtPath.Text, arqSave))
                     {
                         saida.Write(dados.ToString());
                         dados = null;
@@ -455,6 +487,11 @@ namespace ColetaAfde
                 {
                     progressBar1.Value = valor;
                 }
+                else
+                {
+                    progressBar1.Value = progressBar1.Maximum;
+                }
+
                 Debug.WriteLine("Recebidos " + valor + " de " + quantRegistros);
             } while (counterReg * y < quantRegistros);
         }

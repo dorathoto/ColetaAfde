@@ -36,10 +36,12 @@
             this.txtIP = new System.Windows.Forms.TextBox();
             this.btnBuscar = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtPort = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
             this.textBoxt = new System.Windows.Forms.RichTextBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.txtPath = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // txtSenha
@@ -65,7 +67,7 @@
             this.txtUsuario.Name = "txtUsuario";
             this.txtUsuario.Size = new System.Drawing.Size(236, 20);
             this.txtUsuario.TabIndex = 36;
-            this.txtUsuario.Text = "teste fabrica";
+            this.txtUsuario.Text = "Leonardo";
             // 
             // Label4
             // 
@@ -91,16 +93,17 @@
             this.txtIP.Name = "txtIP";
             this.txtIP.Size = new System.Drawing.Size(236, 20);
             this.txtIP.TabIndex = 29;
-            this.txtIP.Text = "192.168.1.130";
+            this.txtIP.Text = "192.168.1.223";
             // 
             // btnBuscar
             // 
-            this.btnBuscar.Location = new System.Drawing.Point(15, 141);
+            this.btnBuscar.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnBuscar.Location = new System.Drawing.Point(12, 185);
             this.btnBuscar.Name = "btnBuscar";
-            this.btnBuscar.Size = new System.Drawing.Size(206, 33);
+            this.btnBuscar.Size = new System.Drawing.Size(200, 33);
             this.btnBuscar.TabIndex = 28;
             this.btnBuscar.Text = "Conectar";
-            this.btnBuscar.UseVisualStyleBackColor = true;
+            this.btnBuscar.UseVisualStyleBackColor = false;
             this.btnBuscar.Click += new System.EventHandler(this.BtnBuscar_Click);
             // 
             // label2
@@ -112,17 +115,17 @@
             this.label2.TabIndex = 44;
             this.label2.Text = "Port:";
             // 
-            // textBox1
+            // txtPort
             // 
-            this.textBox1.Location = new System.Drawing.Point(84, 95);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(236, 20);
-            this.textBox1.TabIndex = 45;
-            this.textBox1.Text = "3000";
+            this.txtPort.Location = new System.Drawing.Point(84, 95);
+            this.txtPort.Name = "txtPort";
+            this.txtPort.Size = new System.Drawing.Size(236, 20);
+            this.txtPort.TabIndex = 45;
+            this.txtPort.Text = "3000";
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(227, 142);
+            this.button3.Location = new System.Drawing.Point(227, 185);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(93, 33);
             this.button3.TabIndex = 46;
@@ -137,20 +140,37 @@
             this.textBoxt.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxt.Location = new System.Drawing.Point(9, 218);
+            this.textBoxt.Location = new System.Drawing.Point(9, 253);
             this.textBoxt.Name = "textBoxt";
             this.textBoxt.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.textBoxt.Size = new System.Drawing.Size(311, 376);
+            this.textBoxt.Size = new System.Drawing.Size(315, 341);
             this.textBoxt.TabIndex = 48;
             this.textBoxt.Text = "saida de log...";
             this.textBoxt.ZoomFactor = 1.4F;
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(9, 181);
+            this.progressBar1.Location = new System.Drawing.Point(9, 224);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(311, 23);
             this.progressBar1.TabIndex = 49;
+            // 
+            // txtPath
+            // 
+            this.txtPath.Location = new System.Drawing.Point(84, 121);
+            this.txtPath.Name = "txtPath";
+            this.txtPath.Size = new System.Drawing.Size(236, 20);
+            this.txtPath.TabIndex = 50;
+            this.txtPath.Text = "E:\\lixo\\registerDataBase.txt";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(20, 124);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(32, 13);
+            this.label3.TabIndex = 51;
+            this.label3.Text = "Path:";
             // 
             // Form2
             // 
@@ -158,11 +178,13 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(332, 606);
+            this.ClientSize = new System.Drawing.Size(336, 606);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.txtPath);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.textBoxt);
             this.Controls.Add(this.button3);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.txtPort);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtSenha);
             this.Controls.Add(this.Label5);
@@ -173,7 +195,7 @@
             this.Controls.Add(this.btnBuscar);
             this.Name = "Form2";
             this.Text = "POC";
-            this.TopMost = true;
+            this.TopMost = false;
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -188,9 +210,11 @@
         internal System.Windows.Forms.TextBox txtIP;
         internal System.Windows.Forms.Button btnBuscar;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtPort;
         private System.Windows.Forms.Button button3;
         public System.Windows.Forms.RichTextBox textBoxt;
         private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.TextBox txtPath;
+        private System.Windows.Forms.Label label3;
     }
 }
