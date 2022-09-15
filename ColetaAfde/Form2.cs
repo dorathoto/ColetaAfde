@@ -233,7 +233,7 @@ namespace ColetaAfde
 
         public void TesteReg()
         {
-            int y = 5;
+            int y = 20;
             int quantRegistros = 0;
             int counterReg = 0;
             var strComandoComCriptografia = "";
@@ -262,13 +262,10 @@ namespace ColetaAfde
 
                 counterReg++;
 
-                
-                int i = 0;
                 int chkSum = 0;
                 string strRec = "";
                 int idxByte = 0;
                 string dados = "";
-
                 Random rnd = new Random();
 
                 byte[] IV = new byte[16];
@@ -299,42 +296,37 @@ namespace ColetaAfde
                 // tamanho
                 byte[] cmdCrypt = Encoding.Default.GetBytes(Encoding.Default.GetChars(EncryptStringToBytes_Aes(strComandoComCriptografia, chaveAes, IV)));
                 chkSum = 0;
-                i = 0;
-
-                while (i < IV.Length)
+                
+                for (int i = 0; i < IV.Length; i++)
                 {
                     comandoByte[IdxComandoByte] = IV[i];
                     IdxComandoByte++;
-                    i++;
                 }
-                i = 0;
-                while (i < cmdCrypt.Length)
+
+                for (int i = 0; i < cmdCrypt.Length; i++)
                 {
                     comandoByte[IdxComandoByte] = cmdCrypt[i];
                     IdxComandoByte++;
-                    i++;
                 }
 
-                i = 1;
-                while (i < IdxComandoByte)
+                for (int i = 1; i < IdxComandoByte; i++)
                 {
                     chkSum ^= comandoByte[i];
-                    i++;
                 }
+              
                 comandoByte[IdxComandoByte] = (byte)chkSum;
                 IdxComandoByte++;
 
                 comandoByte[IdxComandoByte] = 3;
 
                 string strAux = "";
-                i = 0;
-                while (i < IdxComandoByte)
+                for (int i = 0; i < IdxComandoByte; i++)
                 {
                     strAux += Convert.ToChar(comandoByte[i]);
-                    i++;
                 }
+               
                 byte[] envCommand = new byte[IdxComandoByte + 1];
-                for (i = 0; i < IdxComandoByte + 1; i++)
+                for (int i = 0; i < IdxComandoByte + 1; i++)
                 {
                     envCommand[i] = comandoByte[i];
                     //   Debug.WriteLine("comandoByte[" + i + "] = " + comandoByte[i] + "  envCommand[" + i + "] = " + envCommand[i]);
@@ -346,73 +338,67 @@ namespace ColetaAfde
                 quantBytesRec = client.Receive(bufferBytes);
 
                 response = "";
-                i = 0;
-                while (i < quantBytesRec)
+                for (int i = 0; i < quantBytesRec; i++)
                 {
                     response += (char)bufferBytes[i];
                     bufferBytes[i] = 0;
-                    i++;
                 }
+               
 
-                i = 0;
+                
                 strRec = "";
                 idxByte = 0;
                 byte[] byteData = new byte[quantBytesRec - 5];
+                var count = 0;
                 while (idxByte < quantBytesRec)
                 {
                     if (idxByte >= 3)
                     {
                         if (idxByte <= quantBytesRec - 3)
                         {
-                            byteData[i] = Convert.ToByte(response.ElementAt(idxByte)); //contém a resposta em bytes armazenada
-                            i++;
+                            byteData[count] = Convert.ToByte(response.ElementAt(idxByte)); //contém a resposta em bytes armazenada
+                            count++;
                             strRec += response.ElementAt(idxByte);
                         }
                     }
                     idxByte++;
                 }
-                i = 0;
-                while (i < 16)
+
+                for (int i = 0; i < 16; i++)
                 {
                     IV[i] = byteData[i];
-                    i++;
                 }
-
+               
                 byte[] byteData2 = new byte[quantBytesRec - 16 - 5];
-                i = 0;
-
-                while (i < byteData.Length - 16)
+                for (int i = 0; i < byteData.Length - 16; i++)
                 {
                     byteData2[i] = byteData[i + 16];
                     byteData[i + 16] = 0;
-                    i++;
                 }
 
                 byte[] bufferRecDecrypt = DecryptStringFromBytes_Aes2(byteData2, chaveAes, IV);
-                for (i = 0; i < byteData2.Length; i++)
+                for (int i = 0; i < byteData2.Length; i++)
                 {
                     byteData2[i] = 0;
                 }
 
-                i = 0;
-                while (i < bufferRecDecrypt.Length)
+                for (int i = 0; i < bufferRecDecrypt.Length; i++)
                 {
                     if (Convert.ToChar(bufferRecDecrypt[i]) == '{')
                     {
                         break;
                     }
-                    i++;
                 }
+               
 
-                for (i = 0; i < bufferRecDecrypt.Length; i++)
+                for (int i = 0; i < bufferRecDecrypt.Length; i++)
                 {
                     registros[i] = bufferRecDecrypt[i];
                     bufferRecDecrypt[i] = 0;
                     //Console.WriteLine("registros[" + i + "] = " + registros[i]);
                 }
-                i = 0;
-
-                for (i = 0; i < registros.Length; i++)
+                
+                for (int i = 0; i < registros.Length; i++)
                 {
                     if (registros[i] != 0)
                     {
