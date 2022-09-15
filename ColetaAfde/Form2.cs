@@ -38,6 +38,8 @@ namespace ColetaAfde
 
         private void BtnBuscar_Click(object sender, EventArgs e)
         {
+
+            
             if (txtPort.Text != "3000")
             {
                 port = Convert.ToInt32(txtPort.Text);
@@ -72,12 +74,13 @@ namespace ColetaAfde
 
                     bool conectado = client.Connected;
 
-                    if (conectado == false)
+                    if (!conectado)
                     {
                         client.Connect(remoteEP);
                     }
 
-                    GerarChaveAesAleatorias();
+                    //GerarChaveAesAleatorias();
+                    GerarAleatorias(ref chaveAes);
 
                     command = "";
                     command += (char)(2);
@@ -224,28 +227,9 @@ namespace ColetaAfde
             }
             TesteReg();
 
+
         }
 
-        private void GerarChaveAesAleatorias()
-        {
-            Random rnd = new Random();
-            chaveAes[0] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[1] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[2] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[3] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[4] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[5] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[6] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[7] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[8] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[9] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[10] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[11] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[12] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[13] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[14] = Convert.ToByte(rnd.Next(1, 256));
-            chaveAes[15] = Convert.ToByte(rnd.Next(1, 256));
-        }
 
         public void TesteReg()
         {
@@ -253,25 +237,22 @@ namespace ColetaAfde
             int quantRegistros = 0;
             int counterReg = 0;
             var strComandoComCriptografia = "";
-            bool arqSave = false;
 
             do
             {
-
-                // if (counterReg > 0) strComandoComCriptografia = "01+RR+00+N]" + y.ToString() + "]999";
-                //  if (counterReg > 0) strComandoComCriptografia = "01+RR+00+N]1]" + (counterReg+1).ToString();
-
-
                 if (counterReg > 0)
                 {
                     var qtdRegistros = counterReg * y - (y - 1);
                     //RR - Recebe os registros				
                     
-                    strComandoComCriptografia = "01+RR+00+N]" + y.ToString() + "]" + (counterReg * y - (y - 1)).ToString(); //counterReg.ToString();// + txtRegistros.Text + "]1";
+                  //  strComandoComCriptografia = "01+RR+00+N]" + y.ToString() + "]" + (counterReg * y - (y - 1)).ToString(); //counterReg.ToString();// + txtRegistros.Text + "]1";
+                   // Debug.WriteLine($"Comando enviado.: {strComandoComCriptografia}");
+
+                    // strComandoComCriptografia = "01+RR+00+D]12]11/09/2022 02:00:01]"; // base de data
+                    //  Debug.WriteLine($"Comando enviado.: {strComandoComCriptografia}");
+
+                    strComandoComCriptografia = "01+RR+00+N]6]50";
                     Debug.WriteLine($"Comando enviado.: {strComandoComCriptografia}");
-                    
-                   // strComandoComCriptografia = "01+RR+00+D]12]11/09/2022 02:00:01]"; // base de data
-                  //  Debug.WriteLine($"Comando enviado.: {strComandoComCriptografia}");
 
                 }
                 else
@@ -291,22 +272,7 @@ namespace ColetaAfde
                 Random rnd = new Random();
 
                 byte[] IV = new byte[16];
-                IV[0] = Convert.ToByte(rnd.Next(1, 256));
-                IV[1] = Convert.ToByte(rnd.Next(1, 256));
-                IV[2] = Convert.ToByte(rnd.Next(1, 256));
-                IV[3] = Convert.ToByte(rnd.Next(1, 256));
-                IV[4] = Convert.ToByte(rnd.Next(1, 256));
-                IV[5] = Convert.ToByte(rnd.Next(1, 256));
-                IV[6] = Convert.ToByte(rnd.Next(1, 256));
-                IV[7] = Convert.ToByte(rnd.Next(1, 256));
-                IV[8] = Convert.ToByte(rnd.Next(1, 256));
-                IV[9] = Convert.ToByte(rnd.Next(1, 256));
-                IV[10] = Convert.ToByte(rnd.Next(1, 256));
-                IV[11] = Convert.ToByte(rnd.Next(1, 256));
-                IV[12] = Convert.ToByte(rnd.Next(1, 256));
-                IV[13] = Convert.ToByte(rnd.Next(1, 256));
-                IV[14] = Convert.ToByte(rnd.Next(1, 256));
-                IV[15] = Convert.ToByte(rnd.Next(1, 256));
+                GerarAleatorias(ref IV);
                 int tamanhoPacote;
                 
                 if ((counterReg * y - (y - 1)) < 1001)
@@ -475,12 +441,11 @@ namespace ColetaAfde
                 {
                     textBoxt.AppendText("Registro salvo: " + dados + "\n");
                     
-                    using (StreamWriter saida = new StreamWriter(txtPath.Text, arqSave))
+                    using (StreamWriter saida = new StreamWriter(txtPath.Text, false))
                     {
                         saida.Write(dados.ToString());
                         dados = null;
                     }
-                    arqSave = true;
                 }
                 var valor = counterReg * y;
                 if (valor < progressBar1.Maximum)
@@ -514,18 +479,27 @@ namespace ColetaAfde
 
 
 
+        private void GerarAleatorias(ref byte[] obj)
+        {
+            Random rnd = new Random();
+            obj[0] = Convert.ToByte(rnd.Next(1, 256));
+            obj[1] = Convert.ToByte(rnd.Next(1, 256));
+            obj[2] = Convert.ToByte(rnd.Next(1, 256));
+            obj[3] = Convert.ToByte(rnd.Next(1, 256));
+            obj[4] = Convert.ToByte(rnd.Next(1, 256));
+            obj[5] = Convert.ToByte(rnd.Next(1, 256));
+            obj[6] = Convert.ToByte(rnd.Next(1, 256));
+            obj[7] = Convert.ToByte(rnd.Next(1, 256));
+            obj[8] = Convert.ToByte(rnd.Next(1, 256));
+            obj[9] = Convert.ToByte(rnd.Next(1, 256));
+            obj[10] = Convert.ToByte(rnd.Next(1, 256));
+            obj[11] = Convert.ToByte(rnd.Next(1, 256));
+            obj[12] = Convert.ToByte(rnd.Next(1, 256));
+            obj[13] = Convert.ToByte(rnd.Next(1, 256));
+            obj[14] = Convert.ToByte(rnd.Next(1, 256));
+            obj[15] = Convert.ToByte(rnd.Next(1, 256));
 
-
-
-
-
-
-
-
-
-
-
-
+        }
 
         public static byte[] RSAEncrypt(byte[] DataToEncrypt, RSAParameters RSAKeyInfo, bool DoOAEPPadding)
         {

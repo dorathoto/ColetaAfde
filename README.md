@@ -6,6 +6,9 @@ Inicialmente é utilizada uma chave assimétrica(chave pública) para realizar a
 São utilizadas criptografia *RSA 1024 bits*, e *AES CBC 16*.
 
 
+Programa de exemplo fará a seguinte consulta no aparelho:
+01+RR+00+N]5]1
+Verificar Excel com o significado da consulta
 
 **O processo para autenticação no Hexa é basicamente o seguinte:**
 1. O software envia o comando RA.
