@@ -11,6 +11,11 @@ using System.Windows.Forms;
 
 namespace ColetaAfde
 {
+
+    /// <summary>
+    /// Refatory do WindowsForm SDK Disponibilizado pela Henry
+    /// Nenhuma lógica foi alterada apenas comentários e código mais C# e menos java
+    /// </summary>
     public partial class Form2 : Form
     {
         private static String response = String.Empty;
@@ -62,7 +67,6 @@ namespace ColetaAfde
                     byte chkSum = 0;
                     string strComandoComCriptografia = "";
                     string strAux = "";
-                    string quantReg = "";
 
                     int i = 0;
 
@@ -240,7 +244,7 @@ namespace ColetaAfde
 
             do
             {
-                if (counterReg > 0)
+                if (counterReg > 0)//primeira vez counterReg=0 pegará qtd NSR, depois irá de 5 em 5 até a qtd. total
                 {
                    
                     //RR - Recebe os registros				
