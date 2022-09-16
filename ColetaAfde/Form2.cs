@@ -233,7 +233,7 @@ namespace ColetaAfde
 
         public void TesteReg()
         {
-            int y = 20;
+            int y = 5;
             int quantRegistros = 0;
             int counterReg = 0;
             var strComandoComCriptografia = "";
@@ -242,17 +242,14 @@ namespace ColetaAfde
             {
                 if (counterReg > 0)
                 {
-                    var qtdRegistros = counterReg * y - (y - 1);
+                   
                     //RR - Recebe os registros				
                     
-                  //  strComandoComCriptografia = "01+RR+00+N]" + y.ToString() + "]" + (counterReg * y - (y - 1)).ToString(); //counterReg.ToString();// + txtRegistros.Text + "]1";
-                   // Debug.WriteLine($"Comando enviado.: {strComandoComCriptografia}");
+                    strComandoComCriptografia = "01+RR+00+N]" + y.ToString() + "]" + (counterReg * y - (y - 1)).ToString(); //counterReg.ToString();// + txtRegistros.Text + "]1";
+                    Debug.WriteLine($"Comando enviado.: {strComandoComCriptografia}");
 
                     // strComandoComCriptografia = "01+RR+00+D]12]11/09/2022 02:00:01]"; // base de data
                     //  Debug.WriteLine($"Comando enviado.: {strComandoComCriptografia}");
-
-                    strComandoComCriptografia = "01+RR+00+N]6]50";
-                    Debug.WriteLine($"Comando enviado.: {strComandoComCriptografia}");
 
                 }
                 else
