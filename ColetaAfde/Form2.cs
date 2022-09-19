@@ -68,8 +68,6 @@ namespace ColetaAfde
                     string strComandoComCriptografia = "";
                     string strAux = "";
 
-                    int i = 0;
-
                     if (client == null)
                     {
                         client = new Socket(AddressFamily.InterNetwork,
@@ -109,11 +107,9 @@ namespace ColetaAfde
                     quantBytesRec = client.Receive(bufferBytes);
 
                     response = "";
-                    while (i < quantBytesRec)
+                    for (int i = 0; i < quantBytesRec; i++)
                     {
                         response += (char)bufferBytes[i];
-
-                        i++;
                     }
 
                     Debug.WriteLine("string da resposta: " + response.ToString());
@@ -179,12 +175,9 @@ namespace ColetaAfde
                     sendDone.WaitOne();
                     quantBytesRec = client.Receive(bufferBytes);
                     response = "";
-                    i = 0;
-                    while (i < quantBytesRec)
+                    for (int i = 0; i < quantBytesRec; i++)
                     {
-
                         response += Convert.ToChar(bufferBytes[i]);
-                        i++;
                     }
 
                     strRec = "";
@@ -246,10 +239,11 @@ namespace ColetaAfde
             {
                 if (counterReg > 0)//primeira vez counterReg=0 pegará qtd NSR, depois irá de 5 em 5 até a qtd. total
                 {
-                   
-                    //RR - Recebe os registros				
-                    
-                    strComandoComCriptografia = "01+RR+00+N]" + y.ToString() + "]" + (counterReg * y - (y - 1)).ToString(); //counterReg.ToString();// + txtRegistros.Text + "]1";
+
+                    //RR - Recebe os registros	
+                    // 01+RR+00+N]5]11		
+
+                    strComandoComCriptografia = $"01+RR+00+N]{y}]{(counterReg * y - (y - 1))}"; //counterReg.ToString();// + txtRegistros.Text + "]1";
                     Debug.WriteLine($"Comando enviado.: {strComandoComCriptografia}");
 
                     // strComandoComCriptografia = "01+RR+00+D]12]11/09/2022 02:00:01]"; // base de data
